@@ -75,3 +75,23 @@ def list_properties():
         'number_of_rooms': property.number_of_rooms,
         'created_by': property.created_by
     } for property in properties])
+    
+@app.route('/properties/<int:property_id>', methods=['GET'])
+def get_property(property_id):
+    user_id = request.args.get('user_id')
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    property = db.session.get(Property, property_id)
+    if not property:
+        return jsonify({'message': 'Property not found'}), 404
+
+    return jsonify({
+        'id': property.id,
+        'address': property.address,
+        'postcode': property.postcode,
+        'city': property.city,
+        'number_of_rooms': property.number_of_rooms,
+        'created_by': property.created_by
+    })

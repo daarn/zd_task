@@ -31,8 +31,8 @@ def test_create_property(client):
 def test_get_all_properties(client):
     user = User.query.filter_by(username="testuser").first()
 
-    property1 = Property(address="1 Avenue", postcode="BT1 2AB", city="TestCity", number_of_rooms=3, created_by=user.id)
-    property2 = Property(address="2 Avenue", postcode="BT2 3BC", city="TestCity2", number_of_rooms=2, created_by=user.id)
+    property1 = Property(address="1 Avenue", postcode="BT1 2AB", city="AllCity", number_of_rooms=3, created_by=user.id)
+    property2 = Property(address="2 Avenue", postcode="BT2 3BC", city="AllCityTwo", number_of_rooms=2, created_by=user.id)
     db.session.add(property1)
     db.session.add(property2)
     db.session.commit()
@@ -43,3 +43,16 @@ def test_get_all_properties(client):
     assert len(data) == 2
     assert data[0]['address'] == "1 Avenue"
     assert data[1]['address'] == "2 Avenue"
+    
+def test_get_specific_property(client):
+    user = User.query.filter_by(username="testuser").first()
+
+    property = Property(address="3 Street", postcode="BT3 4DE", city="SpecificCity", number_of_rooms=1, created_by=user.id)
+    db.session.add(property)
+    db.session.commit()
+
+    response = client.get(f'/properties/{property.id}?user_id={user.id}')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['address'] == "3 Street"
+    assert data['city'] == "SpecificCity"
