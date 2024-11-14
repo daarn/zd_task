@@ -66,7 +66,7 @@ def list_properties():
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    properties = Property.query.filter_by(created_by = user.id).all()
+    properties = Property.query.all()
     return jsonify([{
         'id': property.id,
         'address': property.address,
