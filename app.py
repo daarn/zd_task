@@ -58,3 +58,20 @@ def create_property():
     db.session.add(new_property)
     db.session.commit()
     return jsonify({'message': 'Property created successfully'}), 201
+
+@app.route('/properties', methods=['GET'])
+def list_properties():
+    user_id = request.args.get('user_id')
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    properties = Property.query.filter_by(created_by = user.id).all()
+    return jsonify([{
+        'id': property.id,
+        'address': property.address,
+        'postcode': property.postcode,
+        'city': property.city,
+        'number_of_rooms': property.number_of_rooms,
+        'created_by': property.created_by
+    } for property in properties])

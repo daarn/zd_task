@@ -1,5 +1,5 @@
 import pytest
-from app import app, db, User
+from app import app, db, User, Property
 
 @pytest.fixture
 def client():
@@ -27,3 +27,19 @@ def test_create_property(client):
     assert response.status_code == 201
     data = response.get_json()
     assert data['message'] == 'Property created successfully'
+    
+def test_get_all_properties(client):
+    user = User.query.filter_by(username="testuser").first()
+
+    property1 = Property(address="1 Avenue", postcode="BT1 2AB", city="TestCity", number_of_rooms=3, created_by=user.id)
+    property2 = Property(address="2 Avenue", postcode="BT2 3BC", city="TestCity2", number_of_rooms=2, created_by=user.id)
+    db.session.add(property1)
+    db.session.add(property2)
+    db.session.commit()
+
+    response = client.get(f'/properties?user_id={user.id}')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 2
+    assert data[0]['address'] == "1 Avenue"
+    assert data[1]['address'] == "2 Avenue"
