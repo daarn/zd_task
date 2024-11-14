@@ -11,6 +11,18 @@ class User(db.Model):
     username = db.Column(db.String(80), unique = True, nullable = False)
     is_admin = db.Column(db.Boolean, default = False)
     
+class Property(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(200), nullable=False)
+    postcode = db.Column(db.String(20), nullable=False)
+    city = db.Column(db.String(50), nullable=False)
+    number_of_rooms = db.Column(db.Integer, nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('properties', lazy=True))
+
+with app.app_context():
+    db.create_all()
+
 @app.route('/users', methods = ['POST'])
 def create_user():
     data = request.json
@@ -27,3 +39,22 @@ def create_user():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User created successfully', 'user_id': new_user.id}), 201
+
+@app.route('/properties', methods=['POST'])
+def create_property():
+    data = request.json
+    user_id = data.get('user_id')
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    new_property = Property(
+        address=data['address'],
+        postcode=data['postcode'],
+        city=data['city'],
+        number_of_rooms=data['number_of_rooms'],
+        created_by=user.id
+    )
+    db.session.add(new_property)
+    db.session.commit()
+    return jsonify({'message': 'Property created successfully'}), 201
