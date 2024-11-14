@@ -17,6 +17,12 @@ def create_user():
     username = data.get('username')
     is_admin = data.get('is_admin', False)
 
+    if not username:
+        return jsonify({'message': 'Username is required'}), 400
+
+    if User.query.filter_by(username = username).first():
+        return jsonify({'message': 'Username already exists'}), 409
+
     new_user = User(username = username, is_admin = is_admin)
     db.session.add(new_user)
     db.session.commit()
