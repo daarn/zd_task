@@ -95,3 +95,18 @@ def get_property(property_id):
         'number_of_rooms': property.number_of_rooms,
         'created_by': property.created_by
     })
+    
+@app.route('/properties/<int:property_id>', methods=['DELETE'])
+def delete_property(property_id):
+    user_id = request.args.get('user_id')
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    property = db.session.get(Property, property_id)
+    if not property:
+        return jsonify({'message': 'Property not found'}), 404
+
+    db.session.delete(property)
+    db.session.commit()
+    return jsonify({'message': 'Property deleted successfully'})

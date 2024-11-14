@@ -19,7 +19,7 @@ def test_create_property(client):
     new_property = {
         "address": "123 Street",
         "postcode": "BT1 3AB",
-        "city": "Belfast",
+        "city": "CreateCity",
         "number_of_rooms": 5,
         "user_id": user.id 
     }
@@ -56,3 +56,28 @@ def test_get_specific_property(client):
     data = response.get_json()
     assert data['address'] == "3 Street"
     assert data['city'] == "SpecificCity"
+    
+def test_get_nonexistent_property(client):
+    user = User.query.filter_by(username="testuser").first()
+
+    response = client.get(f'/properties/999?user_id={user.id}')
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data['message'] == 'Property not found'
+    
+def test_delete_property(client):
+    user = User.query.filter_by(username="testuser").first()
+
+    property = Property(address="4 Street", postcode="BT5 6GH", city="DeleteCity", number_of_rooms=3, created_by=user.id)
+    db.session.add(property)
+    db.session.commit()
+
+    response = client.delete(f'/properties/{property.id}?user_id={user.id}')
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['message'] == 'Property deleted successfully'
+
+    response = client.get(f'/properties/{property.id}?user_id={user.id}')
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data['message'] == 'Property not found'
