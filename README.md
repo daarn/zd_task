@@ -22,7 +22,7 @@ source venv/bin/activate
 `flask run`
 
 ### 6. Alternatively, run the tests:
-`pytest`
+`PYTHONPATH=. pytest tests`
 
 
 ## API Endpoints
