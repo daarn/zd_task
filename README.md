@@ -21,6 +21,9 @@ source venv/bin/activate
 ### 5. Run the application
 `flask run`
 
+### 6. Alternatively, run the tests:
+`pytest`
+
 
 ## API Endpoints
 ### **User Endpoints**
