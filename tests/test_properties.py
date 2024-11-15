@@ -8,7 +8,11 @@ def client():
     with app.app_context():
         db.create_all()
         test_user = User(username="testuser", is_admin=False)
+        test_user2 = User(username="testuser2", is_admin=False)
+        
         db.session.add(test_user)
+        db.session.add(test_user2)
+        
         db.session.commit()
         yield app.test_client()
         db.drop_all()
@@ -71,6 +75,11 @@ def test_delete_property(client):
     property = Property(address="4 Street", postcode="BT5 6GH", city="DeleteCity", number_of_rooms=3, created_by=user.id)
     db.session.add(property)
     db.session.commit()
+    
+    response = client.delete(f'/properties/{property.id}?user_id={2}')
+    assert response.status_code == 404
+    data = response.get_json()
+    assert data['message'] == 'User does not own the specified property'
 
     response = client.delete(f'/properties/{property.id}?user_id={user.id}')
     assert response.status_code == 200

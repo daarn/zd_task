@@ -106,6 +106,8 @@ def delete_property(property_id):
     property = db.session.get(Property, property_id)
     if not property:
         return jsonify({'message': 'Property not found'}), 404
+    elif property.created_by != user.id:
+        return jsonify({'message': 'User does not own the specified property'}), 404
 
     db.session.delete(property)
     db.session.commit()
