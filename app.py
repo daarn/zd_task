@@ -1,12 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import ValidationError
+from config import Config
 
 from schemas import UserSchema, PropertySchema
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///properties.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config.from_object(Config)
 db = SQLAlchemy(app)
 
 ##### MODELS #####

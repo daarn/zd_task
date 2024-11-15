@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 pytest
 marshmallow
 marshmallow-sqlalchemy
+python-dotenv
