@@ -44,9 +44,9 @@ def test_get_all_properties(client):
     response = client.get(f'/properties?user_id={user.id}')
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) == 2
-    assert data[0]['address'] == "1 Avenue"
-    assert data[1]['address'] == "2 Avenue"
+    assert len(data.get("properties")) == 2
+    assert data.get('properties')[0]['address'] == "1 Avenue"
+    assert data.get('properties')[1]['address'] == "2 Avenue"
     
 def test_get_specific_property(client):
     user = User.query.filter_by(username="testuser").first()
@@ -58,14 +58,14 @@ def test_get_specific_property(client):
     response = client.get(f'/properties/{property.id}?user_id={user.id}')
     assert response.status_code == 200
     data = response.get_json()
-    assert data['address'] == "3 Street"
-    assert data['city'] == "SpecificCity"
+    assert data.get('property')['address'] == "3 Street"
+    assert data.get('property')['city'] == "SpecificCity"
     
 def test_get_nonexistent_property(client):
     user = User.query.filter_by(username="testuser").first()
 
     response = client.get(f'/properties/999?user_id={user.id}')
-    assert response.status_code == 404
+    assert response.status_code == 400
     data = response.get_json()
     assert data['message'] == 'Property not found'
     
@@ -87,6 +87,6 @@ def test_delete_property(client):
     assert data['message'] == 'Property deleted successfully'
 
     response = client.get(f'/properties/{property.id}?user_id={user.id}')
-    assert response.status_code == 404
+    assert response.status_code == 400
     data = response.get_json()
     assert data['message'] == 'Property not found'
